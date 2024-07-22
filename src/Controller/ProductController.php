@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Controller;
+
+use App\Service\ProductService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+
+class ProductController extends AbstractController
+{
+
+    private ProductService $productService;
+    public function __construct
+    (
+        ProductService $productService
+    )
+    {
+        $this->productService = $productService;
+    }
+    #[Route('/product', name: 'app_product', methods: ['GET'])]
+    public function getAll(): JsonResponse
+    {
+        $products = $this->productService->getAllProducts();
+        return $this->json([
+            'data' => $products,
+        ]);
+    }
+    #[Route('/product', name: 'create_product', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+
+        $nome = $data['nome'];
+        $idTypeProduct = $data['idTypeProduct'];
+        $product = $this->productService->createProduct($nome, $idTypeProduct);
+
+        return $this->json([
+            'message' => 'Product created successfully',
+            'data' => $product,
+        ]);
+    }
+    #[Route('/product', name:'delete_product', methods: ['DELETE'])]
+    public function delete(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $product = $this->productService->deleteProduct($data['id']);
+        return $this->json([
+            'message'=> 'Product Deleted Successfully',
+            'data'=> $product
+        ]);
+    }
+    #[Route('/product', name:'update_product', methods: ['PUT'])]
+    public function update(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $newNome = $data['name'];
+        $newTypeProductStr = $data['newTypeProduct'];
+        $id = $data['id'];
+        $product = $this->productService->updateProduct($id, $newNome, $newTypeProductStr);
+        return $this->json([
+            'message'=> 'Product Updated Successfully',
+            'data'=> $product
+        ]); 
+    }
+    #[Route('/product/getbyid', name:'get_by_id', methods: ['GET'])]
+    public function getByid(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $product = $this->productService->getProductByid($data['id']);
+        return $this->json([
+            'message'=> 'Product found',
+            'data'=> $product
+        ]); 
+    }
+
+    #[Route('/product/getbyName', name:'get-by-name', methods: ['GET'])]
+    public function getByName(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $name = $data['name'];
+        $product = $this->productService->getProductByName($name);
+        return $this->json([
+            'message'=> 'Product found',
+            'data'=> $product
+        ]); 
+    }
+    #[Route('/product/getByTypeProduct', name:'get-by-type-product', methods: ['GET'])]
+    public function getByTypeProduct(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $idTypeProduct = $data['id'];
+        $products = $this->productService->getAllByTypeProduct($idTypeProduct);
+        return $this->json([
+            'message'=> 'Product found',
+            'data'=> $products
+        ]); 
+    }
+
+
+
+}

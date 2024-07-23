@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Service;
+use App\Dto\ProductFilter;
 use App\Entity\TypeProduct;
 use App\Repository\ProductRepository;
 use App\Service\TypeProductService;
@@ -26,11 +27,8 @@ class ProductService{
         $this->entityManager = $entityManager;
     }
 
-    public function getAllProducts():array{
-        $products = $this->productRepository->findAll();
-        if(count($products) == 0){
-            throw new \Exception("No products registered");
-        }
+    public function filterProduct(ProductFilter $productFilter):array{
+        $products = $this->productRepository->filterProduct($productFilter);
         return $products;
     }
 
@@ -55,7 +53,7 @@ class ProductService{
         if($productValidate){ 
             throw new \Exception("Este nome de produto já está cadastrado");
         }
-        $typeProduct = $this->typeProductService->find($idTypeProduct);
+        $typeProduct = $this->typeProductService->findById($idTypeProduct);
         if(is_null($typeProduct)){
             throw new \Exception("Product Type not found");
         }
@@ -67,14 +65,14 @@ class ProductService{
         return $product;
     }
 
-    public function updateProduct(int $id, int $idnewTypeProduct, String $newNome) :Product
+    public function updateProduct(int $id, int $idType, String $newNome) :Product
     {
         $productValidate = $this->productRepository->find($id);
         if(is_null($productValidate))
         {
             throw new \Exception("Product not found");
         }
-        $typeProduct = $this->typeProductService->find($idnewTypeProduct);
+        $typeProduct = $this->typeProductService->findById($idType);
         if(is_null($typeProduct)){
             throw new \Exception("Product Type not found");
         }

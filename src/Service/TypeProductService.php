@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Service;
+use App\Dto\TypeProdFilterDto;
 use App\Repository\TypeProductRepository;
 use App\Entity\TypeProduct;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,8 +20,9 @@ final class TypeProductService
         $this->entityManager = $entityManager;
     }
 
-    public function getAllTypes(): array{
-        return $this->typeProductRepository->findAll();
+    public function filterTypeProd(TypeProdFilterDto $filter): array{
+        $types = $this->typeProductRepository->filterTypeProduct($filter);
+        return $types;
     }   
 
     public function create(String $type): TypeProduct{
@@ -32,8 +34,8 @@ final class TypeProductService
         return $typeProduct;
     }
 
-    public function update(String $newType, String $typeProductFind): TypeProduct{
-        $typeProduct = $this->typeProductRepository->findOneByTypeProduct($typeProductFind);
+    public function update(String $newType, int $id): TypeProduct{
+        $typeProduct = $this->typeProductRepository->find($id);
         if(!$typeProduct){
             throw new \Exception("Product type not found");
         }
@@ -51,19 +53,11 @@ final class TypeProductService
         $this->entityManager->remove($typeProduct);
     }
 
-    public function find(String $typeProduct): TypeProduct{
-        $typeProduct = $this->typeProductRepository->findOneByTypeProduct($typeProduct);
-        if(!$typeProduct){
-            throw new \Exception("Product type not found");
-        }
-        return $typeProduct;
-    }
-
     public function findById(int $id){
         $typeProduct = $this->typeProductRepository->findOneById($id);
         if(!$typeProduct)
         {
-            throw new \Exception("Type Product not found");
+            throw new \Exception("Product type not found");
         }
         return $typeProduct;
     }

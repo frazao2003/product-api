@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Dto\ProductFilter;
 
 
 /**
@@ -38,6 +39,27 @@ class ProductRepository extends ServiceEntityRepository
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
+        }
+
+        public function filterProduct(ProductFilter $filter): array
+        {
+            $qb = $this->createQueryBuilder('p');
+            $hasFilter = false;
+
+            if ($filter->getName() !== null) {
+                $qb->andWhere('TRANSLATE(LOWER(p.name), \' \', \'\') = TRANSLATE(LOWER(:name), \' \', \'\')')
+                   ->setParameter('name', $filter->getName());
+                $hasFilter = true;
+            }
+    
+            if ($filter->getIdType() !== null) {
+                $qb->andWhere('p.idType = :idType')
+                   ->setParameter('idType', $filter->getIdType());
+                $hasFilter = true;
+            }
+    
+            // Simulação da execução da query e retorno dos resultados
+            return $qb->getQuery()->getResult();
         }
 
 }

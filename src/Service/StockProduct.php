@@ -7,7 +7,7 @@ class StockProduct {
 
     private StockProductRepository $stockProductRepository;
 
-    public function __construct
+    public function __construct 
     (
         StockProductRepository $stockProductRepository
     ) 

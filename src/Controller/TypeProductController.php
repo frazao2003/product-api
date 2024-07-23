@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\TypeProdFilterDto;
 use App\Service\TypeProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,17 +58,30 @@ class TypeProductController extends AbstractController
         ]);
     }
     #[Route('/type/products', name: 'get_type_product', methods: ['GET'])]
-    public function getByTypeProduct(Request $request): JsonResponse{
+    public function filterTypeProduct(Request $request): JsonResponse{
         if($request -> headers->get('Content-Type') == 'application/json'){
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
+        $typeProdDto = new TypeProdFilterDto();
+        $typeProdDto->setType($data['typeProduct']);
 
-        $typeProduct = $this->typeProductService->find($data['']);
+        $typeProduct = $this->typeProductService->filterTypeProd($typeProdDto);
 
         return $this->json([
             'message' => 'Product type find successfully',
             'data' => $typeProduct,
         ]);
     }
+    #[Route('/type/products/{id}', name: 'get_type_product', methods: ['GET'])]
+    public function getById(int $id): JsonResponse
+    {
+        $typeProduct = $this->typeProductService->findById($id);
+        return $this->json([
+            'message'=> 'Product Type found',
+            'data' => $typeProduct
+        ]);
+    }
+
+
 }

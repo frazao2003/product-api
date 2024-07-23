@@ -19,7 +19,7 @@ class Product
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?TypeProduct $TypeProduct = null;
+    private ?TypeProduct $typeProduct = null;
 
 
     public function getId(): ?int
@@ -38,15 +38,15 @@ class Product
 
         return $this;
     }
-    public function setTypeProduct(TypeProduct $TypeProduct): static
+    public function setTypeProduct(TypeProduct $typeProduct): static
     {
-        $this->TypeProduct = $TypeProduct;
+        $this->typeProduct = $typeProduct;
 
         return $this;
     }
     public function getTypeProduct(): ?TypeProduct
     {
-        return $this->TypeProduct;
+        return $this->typeProduct;
     }
 
 }

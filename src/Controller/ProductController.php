@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\ProductFilter;
 use App\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,9 +21,19 @@ class ProductController extends AbstractController
         $this->productService = $productService;
     }
     #[Route('/product', name: 'app_product', methods: ['GET'])]
-    public function getAll(): JsonResponse
+    public function filterProduct(Request $request): JsonResponse
     {
-        $products = $this->productService->getAllProducts();
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+
+        $productFilter = new ProductFilter();
+        $productFilter->setName($data['name']);
+        $productFilter->setIdType($data['idType']);
+
+        $products = $this->productService->filterProduct($productFilter);
+
         return $this->json([
             'data' => $products,
         ]);
@@ -44,21 +55,17 @@ class ProductController extends AbstractController
             'data' => $product,
         ]);
     }
-    #[Route('/product', name:'delete_product', methods: ['DELETE'])]
-    public function delete(Request $request): JsonResponse
+    #[Route('/product/{id}', name:'delete_product', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
     {
-        if($request -> headers->get('Content-Type') == 'application/json'){
-            $data = $request->toArray();
-
-        }else{throw new \Exception('Data format not accepted');}
-        $product = $this->productService->deleteProduct($data['id']);
+        $product = $this->productService->deleteProduct($id);
         return $this->json([
             'message'=> 'Product Deleted Successfully',
             'data'=> $product
         ]);
     }
-    #[Route('/product', name:'update_product', methods: ['PUT'])]
-    public function update(Request $request): JsonResponse
+    #[Route('/product/{id}', name:'update_product', methods: ['PUT'])]
+    public function update(Request $request, int $id): JsonResponse
     {
         if($request -> headers->get('Content-Type') == 'application/json'){
             $data = $request->toArray();
@@ -66,7 +73,6 @@ class ProductController extends AbstractController
         }else{throw new \Exception('Data format not accepted');}
         $newNome = $data['name'];
         $newTypeProductStr = $data['newTypeProduct'];
-        $id = $data['id'];
         $product = $this->productService->updateProduct($id, $newNome, $newTypeProductStr);
         return $this->json([
             'message'=> 'Product Updated Successfully',
@@ -86,36 +92,5 @@ class ProductController extends AbstractController
             'data'=> $product
         ]); 
     }
-
-    #[Route('/product/getbyName', name:'get-by-name', methods: ['GET'])]
-    public function getByName(Request $request): JsonResponse
-    {
-        if($request -> headers->get('Content-Type') == 'application/json'){
-            $data = $request->toArray();
-
-        }else{throw new \Exception('Data format not accepted');}
-        $name = $data['name'];
-        $product = $this->productService->getProductByName($name);
-        return $this->json([
-            'message'=> 'Product found',
-            'data'=> $product
-        ]); 
-    }
-    #[Route('/product/getByTypeProduct', name:'get-by-type-product', methods: ['GET'])]
-    public function getByTypeProduct(Request $request): JsonResponse
-    {
-        if($request -> headers->get('Content-Type') == 'application/json'){
-            $data = $request->toArray();
-
-        }else{throw new \Exception('Data format not accepted');}
-        $idTypeProduct = $data['id'];
-        $products = $this->productService->getAllByTypeProduct($idTypeProduct);
-        return $this->json([
-            'message'=> 'Product found',
-            'data'=> $products
-        ]); 
-    }
-
-
 
 }

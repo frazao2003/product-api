@@ -41,7 +41,7 @@ class StockProductService {
     {
         if ($entry->getId())
         {
-            $product = $this->stockProductRepository->find($entry->getId());
+            $product = $this->getById($entry->getId());
             if(empty($product))
             {
                 throw new \Exception("Product not found in stock");

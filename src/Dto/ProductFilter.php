@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Dto;
+use App\Entity\TypeProduct;
 
 
 class ProductFilter
 {
      public ?string $name;
 
-     public ?int $idType;
+     public ?TypeProduct $typeProduct;
 
      public function __construct(?string $name = null, ?int $idType = null)
      {
@@ -25,14 +26,14 @@ class ProductFilter
          $this->name = $name;
      }
  
-     public function getIdType(): ?int
+     public function getType(): ?int
      {
-         return $this->idType;
+         return $this->typeProduct;
      }
  
-     public function setIdType(?int $idType): void
+     public function setType(TypeProduct $typeProduct): void
      {
-         $this->idType = $idType;
+         $this->typeProduct = $typeProduct;
      }
 
 

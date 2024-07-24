@@ -57,7 +57,7 @@ class TypeProductController extends AbstractController
             'message' => 'Product type deleted successfully',
         ]);
     }
-    #[Route('/type/products', name: 'get_type_product', methods: ['GET'])]
+    #[Route('/type/products', name: 'filter_type_product', methods: ['GET'])]
     public function filterTypeProduct(Request $request): JsonResponse{
         if($request -> headers->get('Content-Type') == 'application/json'){
             $data = $request->toArray();
@@ -73,7 +73,7 @@ class TypeProductController extends AbstractController
             'data' => $typeProduct,
         ]);
     }
-    #[Route('/type/products/{id}', name: 'get_type_product', methods: ['GET'])]
+    #[Route('/type/products/{id}', name: 'get_by_id', methods: ['GET'])]
     public function getById(int $id): JsonResponse
     {
         $typeProduct = $this->typeProductService->findById($id);

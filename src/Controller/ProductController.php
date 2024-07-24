@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\ProductFilter;
 use App\Service\ProductService;
+use App\Service\TypeProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,12 +14,15 @@ class ProductController extends AbstractController
 {
 
     private ProductService $productService;
+    private TypeProductService  $typeProductService;
     public function __construct
     (
-        ProductService $productService
+        ProductService $productService,
+        TypeProductService $typeProductService
     )
     {
         $this->productService = $productService;
+        $this->typeProductService = $typeProductService;
     }
     #[Route('/product', name: 'app_product', methods: ['GET'])]
     public function filterProduct(Request $request): JsonResponse
@@ -30,7 +34,8 @@ class ProductController extends AbstractController
 
         $productFilter = new ProductFilter();
         $productFilter->setName($data['name']);
-        $productFilter->setIdType($data['idType']);
+        $typeProduct = $this->typeProductService->findById($data['idTypeProduct']);
+        $productFilter->setType($typeProduct);
 
         $products = $this->productService->filterProduct($productFilter);
 
@@ -72,21 +77,17 @@ class ProductController extends AbstractController
 
         }else{throw new \Exception('Data format not accepted');}
         $newNome = $data['name'];
-        $newTypeProductStr = $data['newTypeProduct'];
-        $product = $this->productService->updateProduct($id, $newNome, $newTypeProductStr);
+        $idType = $data['idTypeProduct'];
+        $product = $this->productService->updateProduct($id, $newNome, $idType);
         return $this->json([
             'message'=> 'Product Updated Successfully',
             'data'=> $product
         ]); 
     }
-    #[Route('/product/getbyid', name:'get_by_id', methods: ['GET'])]
-    public function getByid(Request $request): JsonResponse
+    #[Route('/product/{id}', name:'get_by_id', methods: ['GET'])]
+    public function getByid(int $id): JsonResponse
     {
-        if($request -> headers->get('Content-Type') == 'application/json'){
-            $data = $request->toArray();
-
-        }else{throw new \Exception('Data format not accepted');}
-        $product = $this->productService->getProductByid($data['id']);
+        $product = $this->productService->getProductByid($id);
         return $this->json([
             'message'=> 'Product found',
             'data'=> $product

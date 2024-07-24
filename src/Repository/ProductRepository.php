@@ -52,9 +52,9 @@ class ProductRepository extends ServiceEntityRepository
                 $hasFilter = true;
             }
     
-            if ($filter->getIdType() !== null) {
-                $qb->andWhere('p.idType = :idType')
-                   ->setParameter('idType', $filter->getIdType());
+            if ($filter->getType() !== null) {
+                $qb->andWhere('p.typeProduct = :typeProduct')
+                   ->setParameter('typeProduct', $filter->getType());
                 $hasFilter = true;
             }
     

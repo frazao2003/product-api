@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\StockProdFilter;
 use App\Entity\StockProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,55 @@ class StockProductRepository extends ServiceEntityRepository
         parent::__construct($registry, StockProduct::class);
     }
 
-    //    /**
-    //     * @return StockProduct[] Returns an array of StockProduct objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByCodLote(string $cod): StockProduct
+    {
+        return $this->createQueryBuilder("sp")
+        ->andwhere("sp.codLote = :codLote")
+        ->setParameter("codLote", $cod)
+        ->getQuery()->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?StockProduct
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function filterStockProducts(StockProdFilter $filter): array
+    {
+        $qb = $this->createQueryBuilder('sp')
+        ->leftJoin('sp.product', 'p')
+        ->leftJoin('p.typeProduct', 'tp');
+        $hasfilter = false;
+
+        if ($filter->getCodLote() !== null) {
+            $qb->andWhere('sp.codLote = :codLote')
+            ->setParameter('codLote', $filter->getCodLote());
+            $hasfilter = true;
+
+        }
+
+        if ($filter->getExpirationDate() !== null) {
+            $qb->andWhere('sp.expirationDate = :expirationDate')
+            ->setParameter('expirationDate', $filter->getExpirationDate());
+            $hasfilter = true;
+
+        }
+
+        if ($filter->getProduct() !== null) {
+            $qb->andWhere('sp.product = :product')
+            ->setParameter('product', $filter->getProduct());
+            $hasfilter = true;
+
+        }
+
+        if ($filter->getTypeProduct()!== null) {
+            $qb->andWhere('p.typeProduct = :productType')
+            ->setParameter('productType', $filter->getTypeProduct());
+            $hasfilter = true;
+
+        }
+        if (!$hasfilter)
+        {
+            $this->findAll(); 
+            
+        }
+
+        return $qb->getQuery()->getResult();
+
+    }
 }

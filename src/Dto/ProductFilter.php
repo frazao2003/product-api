@@ -26,12 +26,12 @@ class ProductFilter
          $this->name = $name;
      }
  
-     public function getType(): ?int
+     public function getType(): ?TypeProduct
      {
          return $this->typeProduct;
      }
  
-     public function setType(TypeProduct $typeProduct): void
+     public function setType(?TypeProduct $typeProduct): void
      {
          $this->typeProduct = $typeProduct;
      }

@@ -29,7 +29,13 @@ class ProductService{
 
     public function filterProduct(ProductFilter $productFilter):array{
         $products = $this->productRepository->filterProduct($productFilter);
-        return $products;
+        foreach($products as $product){
+            $data [ ] = 
+            [
+                'product' => $product->toArray(),
+            ];
+        }
+        return $data;
     }
 
     public function getProductById(int $id):Product{
@@ -39,16 +45,8 @@ class ProductService{
         }
         return $product;
     }
-    public function getProductByName(string $name):Product
-    {
-        $product = $this->productRepository->findOneByName($name);
-        if(is_null($product)){
-            throw new \Exception("No products registered, with this name");
-        }
-        return $product;
-    }
 
-    public function createProduct(String $nome, int $idTypeProduct):Product{
+    public function createProduct(String $nome, int $idTypeProduct):array{
         $productValidate = $this->productRepository->findOneByName($nome);
         if($productValidate){ 
             throw new \Exception("Este nome de produto já está cadastrado");
@@ -62,7 +60,7 @@ class ProductService{
         $product->setTypeProduct($typeProduct);
         $this->entityManager->persist($product);
         $this->entityManager->flush();
-        return $product;
+        return $product->toArray();
     }
 
     public function updateProduct(int $id, int $idType, String $newNome) :Product

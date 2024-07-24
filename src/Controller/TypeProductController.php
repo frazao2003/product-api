@@ -30,31 +30,27 @@ class TypeProductController extends AbstractController
             'data' => $typeProduct,
         ]);
     }
-    #[Route('/type/products', name: 'edit_type_product', methods: ['PUT'])]
-    public function edit(Request $request):JsonResponse{
+    #[Route('/type/products/{id}', name: 'edit_type_product', methods: ['PUT'])]
+    public function edit(Request $request, int $id):JsonResponse{
         if($request -> headers->get('Content-Type') == 'application/json'){
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
-        $typeProductFind = $data['typeProduct'];
         $newTypeProduct = $data['newTypeProduct']; 
-        $typeProduct = $this->typeProductService->update($newTypeProduct, $typeProductFind);
+        $typeProduct = $this->typeProductService->update($newTypeProduct, $id);
 
         return $this->json([
             'message' => 'Product type updated successfully',
             'data' => $typeProduct,
         ]);
     }
-    #[Route('/type/products', name: 'delete_type_product', methods: ['DELETE'])]
-    public function delete(Request $request): JsonResponse{
-        if($request -> headers->get('Content-Type') == 'application/json'){
-            $data = $request->toArray();
-
-        }else{throw new \Exception('Data format not accepted');}
+    #[Route('/type/products/delete/{id}', name: 'delete_type_product', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse{
         
-        $this->typeProductService->delete($data['typeProduct']);
+        $data = $this->typeProductService->delete($id);
         return $this->json([
             'message' => 'Product type deleted successfully',
+            'data' => $data
         ]);
     }
     #[Route('/type/products', name: 'filter_type_product', methods: ['GET'])]
@@ -65,7 +61,7 @@ class TypeProductController extends AbstractController
         }else{throw new \Exception('Data format not accepted');}
         $typeProdDto = new TypeProdFilterDto();
         $typeProdDto->setType($data['typeProduct']);
-
+        
         $typeProduct = $this->typeProductService->filterTypeProd($typeProdDto);
 
         return $this->json([
@@ -77,9 +73,12 @@ class TypeProductController extends AbstractController
     public function getById(int $id): JsonResponse
     {
         $typeProduct = $this->typeProductService->findById($id);
+        if( !$typeProduct ){
+            throw new \Exception('Product type not found');
+        }
         return $this->json([
             'message'=> 'Product Type found',
-            'data' => $typeProduct
+            'data' => $typeProduct->toArray()   
         ]);
     }
 

@@ -48,5 +48,12 @@ class Product
     {
         return $this->typeProduct;
     }
-
+    public function toArray(): array
+    {
+        return [
+            'id'=> $this->getId(),
+            'name'=> $this->getName(),
+            'type'=> $this->getTypeProduct()->toArray(),
+        ];
+    }
 }

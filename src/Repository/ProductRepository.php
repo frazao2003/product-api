@@ -24,7 +24,7 @@ class ProductRepository extends ServiceEntityRepository
         public function findByTypeProduct($typeProduct): array
         {
             return $this->createQueryBuilder('p')
-                ->andWhere('TRANSLATE(LOWER(p.TypeProduct), \' \', \'\') = TRANSLATE(LOWER(:TypeProduct), \' \', \'\')')
+                ->andWhere('p.TypeProduct = :TypeProduct)')
                 ->setParameter('TypeProduct', $typeProduct)
                 ->orderBy('p.id', 'ASC')
                 ->getQuery()
@@ -35,7 +35,7 @@ class ProductRepository extends ServiceEntityRepository
         public function findOneByName($name): ?Product
         {
             return $this->createQueryBuilder('p')
-            ->andWhere('TRANSLATE(LOWER(p.name), \' \', \'\') = TRANSLATE(LOWER(:name), \' \', \'\')')
+            ->andWhere('p.name = :name')
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
@@ -47,7 +47,7 @@ class ProductRepository extends ServiceEntityRepository
             $hasFilter = false;
 
             if ($filter->getName() !== null) {
-                $qb->andWhere('TRANSLATE(LOWER(p.name), \' \', \'\') = TRANSLATE(LOWER(:name), \' \', \'\')')
+                $qb->andWhere('p.name= :name')
                    ->setParameter('name', $filter->getName());
                 $hasFilter = true;
             }

@@ -32,4 +32,12 @@ class TypeProduct
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "id"=> $this->getId(),
+            "type"=> $this->getTypeProduct(),
+            ];
+        }
 }

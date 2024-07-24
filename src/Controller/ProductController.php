@@ -34,8 +34,14 @@ class ProductController extends AbstractController
 
         $productFilter = new ProductFilter();
         $productFilter->setName($data['name']);
-        $typeProduct = $this->typeProductService->findById($data['idTypeProduct']);
-        $productFilter->setType($typeProduct);
+
+        if($data['idTypeProduct'])
+        {
+            $typeProduct = $this->typeProductService->findById($data['idTypeProduct']);
+            $productFilter->setType($typeProduct);
+
+        }
+        $productFilter->setType(null);
 
         $products = $this->productService->filterProduct($productFilter);
 
@@ -66,22 +72,21 @@ class ProductController extends AbstractController
         $product = $this->productService->deleteProduct($id);
         return $this->json([
             'message'=> 'Product Deleted Successfully',
-            'data'=> $product
+            'data'=> $product->toArray()
         ]);
     }
-    #[Route('/product/{id}', name:'update_product', methods: ['PUT'])]
-    public function update(Request $request, int $id): JsonResponse
+    #[Route('/product/{id}/{idType}', name:'update_product', methods: ['PUT'])]
+    public function update(Request $request, int $id, int $idType): JsonResponse
     {
         if($request -> headers->get('Content-Type') == 'application/json'){
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
         $newNome = $data['name'];
-        $idType = $data['idTypeProduct'];
-        $product = $this->productService->updateProduct($id, $newNome, $idType);
+        $product = $this->productService->updateProduct($id, $idType, $newNome);
         return $this->json([
             'message'=> 'Product Updated Successfully',
-            'data'=> $product
+            'data'=> $product->toArray()
         ]); 
     }
     #[Route('/product/{id}', name:'get_by_id', methods: ['GET'])]
@@ -90,7 +95,7 @@ class ProductController extends AbstractController
         $product = $this->productService->getProductByid($id);
         return $this->json([
             'message'=> 'Product found',
-            'data'=> $product
+            'data'=> $product->toArray()
         ]); 
     }
 

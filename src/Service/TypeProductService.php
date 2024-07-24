@@ -22,19 +22,29 @@ final class TypeProductService
 
     public function filterTypeProd(TypeProdFilterDto $filter): array{
         $types = $this->typeProductRepository->filterTypeProduct($filter);
-        return $types;
+        foreach($types as $type)
+        {
+            $data [] = 
+            [
+                'ProductType' => $type->toArray()
+            ];
+        }
+
+        return $data;
     }   
 
-    public function create(String $type): TypeProduct{
+    public function create(String $type): array{
         $typeProduct = new TypeProduct();
         $typeProduct->setTypeProduct($type);
         $this->entityManager->persist($typeProduct);
         $this->entityManager->flush();
 
-        return $typeProduct;
+        $data = $typeProduct->toArray();
+
+        return $data;
     }
 
-    public function update(String $newType, int $id): TypeProduct{
+    public function update(String $newType, int $id): array{
         $typeProduct = $this->typeProductRepository->find($id);
         if(!$typeProduct){
             throw new \Exception("Product type not found");
@@ -42,18 +52,20 @@ final class TypeProductService
         $typeProduct->setTypeProduct($newType);
         $this->entityManager->persist($typeProduct);
         $this->entityManager->flush();
-        return $typeProduct;
+        return $typeProduct->toArray();
     }
 
-    public function delete(String $typeProduct): void{
-        $typeProduct = $this->typeProductRepository->findOneByTypeProduct($typeProduct);
+    public function delete(int $id): array{
+        $typeProduct = $this->typeProductRepository->find( $id );
         if(!$typeProduct){
             throw new \Exception("Product type not found");
         }
         $this->entityManager->remove($typeProduct);
+        $data = $typeProduct->toArray();
+        return $data;
     }
 
-    public function findById(int $id){
+    public function findById(int $id):TypeProduct{
         $typeProduct = $this->typeProductRepository->findOneById($id);
         if(!$typeProduct)
         {

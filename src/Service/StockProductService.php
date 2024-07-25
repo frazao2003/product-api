@@ -32,6 +32,10 @@ class StockProductService {
                 "Product in Stock" => $stockProduct->toArray(),
             ];
         }
+        if (empty($data))
+        {
+            throw new \Exception("Not found");
+        }
         return $data;
     }
 
@@ -105,5 +109,19 @@ class StockProductService {
         $this->em->persist($product);
         $this->em->flush();
         return $product;
+    }
+
+    public function filterDateRange(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $stockProducts = $this->stockProductRepository->filterDateRange($startDate, $endDate);
+        if(!$stockProducts){
+            throw new \Exception('Product in stock not found in this date range');
+        }
+        foreach ($stockProducts as $stockProduct){
+            $data [] = [
+                $stockProduct->toArray(),
+            ];
+        }
+        return $data;
     }
 }

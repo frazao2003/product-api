@@ -66,6 +66,15 @@ class StockProductRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+    public function filterDateRange(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $qb = $this->createQueryBuilder('sp');
 
+        $qb->where('sp.expirationDate BETWEEN :startDate AND :endDate')
+           ->setParameter('startDate', $startDate)
+           ->setParameter('endDate', $endDate);
+    
+        return $qb->getQuery()->getResult();
     }
 }

@@ -61,7 +61,7 @@ class StockProductController extends AbstractController
         $product = $this->stockProductService->filterStockProd($stockProdFilter);
         return $this->json([
             'data' => $product,
-        ]);
+        ],200);
     }
     #[Route('/stock/product', name: 'input_stock_product', methods: ['POST'])]
     public function inputs(Request $request): JsonResponse
@@ -89,7 +89,7 @@ class StockProductController extends AbstractController
         return $this->json([
             'message' => 'Input accepted',
             'data' => $product->toArray(),
-        ]);
+        ],201);
     }
     #[Route('/stock/product/{id}/{quant}', name: 'output_stock_product', methods: ['POST'])]
     public function outputs(int $quant, int $id): JsonResponse
@@ -99,7 +99,7 @@ class StockProductController extends AbstractController
         return $this->json([
             'message' => 'Output accepted',
             'data'=> $product->toArray()
-        ]);
+        ],201);
     }
     #[Route('/stock/product/{id}', name: 'get_byid_stock_product', methods: ['GET'])]
     public function getById(int $id): JsonResponse
@@ -109,7 +109,25 @@ class StockProductController extends AbstractController
         return $this->json([
             'message' => 'Product Found',
             'data'=> $product->toArray()
-        ]);
+        ],200);
     }
+    #[Route('/stock/product/filter/daterange', name: 'filter_date_range_stock_product', methods: ['GET'])]
+    public function filterDateRange(Request $request): JsonResponse
+    {
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+        $startDate = new \DateTimeImmutable($data['startDate']);
+        $endDate = new \DateTimeImmutable($data['endDate']);
+        $stockProduct = $this->stockProductService->filterDateRange($startDate, $endDate);
+
+        return $this->json([
+            'message'=> 'Stock in product found',
+            'data'=> $stockProduct
+        ],200);
+    }
+
+
 
 }

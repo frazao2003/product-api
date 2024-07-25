@@ -2,6 +2,7 @@
 
 namespace App\Service;
 use App\Dto\ProductFilter;
+use App\Dto\StockProdFilter;
 use App\Entity\TypeProduct;
 use App\Repository\ProductRepository;
 use App\Service\TypeProductService;
@@ -14,17 +15,20 @@ class ProductService{
     private TypeProductService $typeProductService;
     
     private EntityManagerInterface $entityManager;
+    private StockProductService $stockProductService;
 
     public function __construct
     (
         ProductRepository $productRepository,
         TypeProductService $typeProductService,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        StockProductService $stockProductService
     )
     {
         $this->productRepository = $productRepository;
         $this->typeProductService = $typeProductService;
         $this->entityManager = $entityManager;
+        $this->stockProductService = $stockProductService;
     }
 
     public function filterProduct(ProductFilter $productFilter):array{
@@ -88,6 +92,12 @@ class ProductService{
        if(is_null($productValidate)){
         throw new \Exception("Product not found");
        }
+       $stockFilter = new StockProdFilter();
+       $stockFilter->setProduct($productValidate);
+       if(count($this->stockProductService->filterStockProd($stockFilter)) > 0)
+       {
+           throw new \Exception("Delete failed, product already vinculated");
+       } 
        $this->entityManager->remove($productValidate);
        $this->entityManager->flush();
        return $productValidate;

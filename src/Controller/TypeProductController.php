@@ -28,7 +28,7 @@ class TypeProductController extends AbstractController
         return $this->json([
             'message' => 'Product type created successfully',
             'data' => $typeProduct,
-        ]);
+        ],201);
     }
     #[Route('/type/products/{id}', name: 'edit_type_product', methods: ['PUT'])]
     public function edit(Request $request, int $id):JsonResponse{
@@ -42,7 +42,7 @@ class TypeProductController extends AbstractController
         return $this->json([
             'message' => 'Product type updated successfully',
             'data' => $typeProduct,
-        ]);
+        ],200);
     }
     #[Route('/type/products/delete/{id}', name: 'delete_type_product', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse{
@@ -51,7 +51,7 @@ class TypeProductController extends AbstractController
         return $this->json([
             'message' => 'Product type deleted successfully',
             'data' => $data
-        ]);
+        ],200);
     }
     #[Route('/type/products', name: 'filter_type_product', methods: ['GET'])]
     public function filterTypeProduct(Request $request): JsonResponse{
@@ -67,7 +67,7 @@ class TypeProductController extends AbstractController
         return $this->json([
             'message' => 'Product type find successfully',
             'data' => $typeProduct,
-        ]);
+        ],200);
     }
     #[Route('/type/products/{id}', name: 'get_by_id', methods: ['GET'])]
     public function getById(int $id): JsonResponse
@@ -79,7 +79,7 @@ class TypeProductController extends AbstractController
         return $this->json([
             'message'=> 'Product Type found',
             'data' => $typeProduct->toArray()   
-        ]);
+        ],200);
     }
 
 

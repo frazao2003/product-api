@@ -13,7 +13,6 @@ class ProductService{
 
     private ProductRepository $productRepository;
     private TypeProductService $typeProductService;
-    
     private EntityManagerInterface $entityManager;
     private StockProductService $stockProductService;
 

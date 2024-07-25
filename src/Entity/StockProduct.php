@@ -85,7 +85,8 @@ class StockProduct
             'id'=> $this->getId(),
             'quant'=> $this->getQuant(),
             'Product'=> $this->getProduct()->toArray(),
-            'Lote'=> $this->getCodLote(),
+            'lote'=> $this->getCodLote(),
+            'expirationDate'=> $this->getExpirationDate(),
         ];
     }
 }

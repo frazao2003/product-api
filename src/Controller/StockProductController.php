@@ -36,18 +36,31 @@ class StockProductController extends AbstractController
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
-
+        $typeProduct = null;
+        $product = null;
         $stockProdFilter = new StockProdFilter();
-        $stockProdFilter->setCodLote($data['codLote']);
-        $stockProdFilter->setExpirationDate($data['ExpirationDate']);
-        $product = $this->productService->getProductByid($data['idProduct']);
-        $typeProduct = $this->typeProductService->findById($data['typeId']);
-        $stockProdFilter->setProduct($product);
-        $stockProdFilter->setTypeProduct($typeProduct);
+        if ($data['codLote']){
+            $stockProdFilter->setCodLote($data['codLote']);
+        }
+        if ($data['ExpirationDate']){
+        $stockProdFilter->setExpirationDate(new \DateTimeImmutable($data['ExpirationDate']));
+        }
+        if($data['idProduct'])
+        {
+            $product = $this->productService->getProductByid($data['idProduct']);
+            $stockProdFilter->setProduct($product);
 
-        $data = $this->stockProductService->filterStockProd($stockProdFilter);
+        }
+        if ($data['typeId'])
+        {
+            $typeProduct = $this->typeProductService->findById($data['typeId']);
+            $stockProdFilter->setTypeProduct($typeProduct);
+
+        }
+
+        $product = $this->stockProductService->filterStockProd($stockProdFilter);
         return $this->json([
-            'data' => $data,
+            'data' => $product,
         ]);
     }
     #[Route('/stock/product', name: 'input_stock_product', methods: ['POST'])]
@@ -88,7 +101,7 @@ class StockProductController extends AbstractController
             'data'=> $product->toArray()
         ]);
     }
-    #[Route('/stock/product/{id}', name: 'filter_stock_product', methods: ['GET'])]
+    #[Route('/stock/product/{id}', name: 'get_byid_stock_product', methods: ['GET'])]
     public function getById(int $id): JsonResponse
     {
         $product = $this->stockProductService->getById($id);

@@ -24,7 +24,15 @@ class StockProductService {
 
     public function filterStockProd(StockProdFilter $stockProdFilter):array 
     {
-        return $this->stockProductRepository->filterStockProducts($stockProdFilter);
+        $stockProducts = $this->stockProductRepository->filterStockProducts($stockProdFilter);
+        foreach ($stockProducts as $stockProduct) 
+        {
+            $data [] = 
+            [
+                "Product in Stock" => $stockProduct->toArray(),
+            ];
+        }
+        return $data;
     }
 
     public function getById(int $id): StockProduct
@@ -51,9 +59,9 @@ class StockProductService {
             $this->em->flush();
             return $product;
         }
-        if($entry->getExpirationDate() <new \DateTime('now'))
+        if($entry->getExpirationDate() < new \DateTime('now'))
         {
-            throw new \Exception('Expiration date not valid')
+            throw new \Exception('Expiration date not valid');
         }
         if($entry->getCodLote())
         {
@@ -94,6 +102,8 @@ class StockProductService {
             throw new \Exception("Unavailable quantity");
         }
         $product->setQuant($product->getQuant() - $quant);
+        $this->em->persist($product);
+        $this->em->flush();
         return $product;
     }
 }

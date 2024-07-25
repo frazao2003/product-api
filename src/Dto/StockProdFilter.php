@@ -14,11 +14,12 @@ class StockProdFilter
 
     public ?TypeProduct $typeProduct;
 
-    public function __construct(?string $codLote = null, ?\DateTimeImmutable $expirationDate = null, ?Product $product = null)
+    public function __construct(?string $codLote = null, ?\DateTimeImmutable $expirationDate = null, ?Product $product = null, ?TypeProduct $typeProduct = null)
     {
         $this->codLote = $codLote;
         $this->expirationDate = $expirationDate;
         $this->product = $product;
+        $this->typeProduct = $typeProduct;
     }
 
     public function getCodLote(): ?string

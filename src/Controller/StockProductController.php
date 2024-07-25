@@ -18,7 +18,7 @@ class StockProductController extends AbstractController
     private TypeProductService $typeProductService;
     private StockProductService $stockProductService;
 
-    public function construct
+    public function __construct
     (
         ProductService $productService,
         TypeProductService $typeProductService,
@@ -57,22 +57,25 @@ class StockProductController extends AbstractController
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
+        $idProduct = $data['idProduct'];
+        $product = null;
+        if ($data['idProduct']){
+            $product = $this->productService->getProductById($idProduct);
+        }
+        $date = new \DateTime($data['expirationDate']);
 
-        $product = $this->productService->getProductById($data['idProduct']);
-
-        $entryDTO = new EntryDTO( 
-           $data['codLote'],
-           $product,
-           $data['expirationDate'],
-           $data['quant'].
-           $data['id'],
-        );
+        $entryDTO = new EntryDTO();
+        $entryDTO->setCodLote($data['codLote']);
+        $entryDTO->setExpirationDate($date);
+        $entryDTO->setProduct($product);
+        $entryDTO->setQuant($data['quant']);
+        $entryDTO->setId($data['id']);
 
         $product = $this->stockProductService->inputs($entryDTO);
         
         return $this->json([
-            'message' => 'Inputs accepted',
-            'data' => $product,
+            'message' => 'Input accepted',
+            'data' => $product->toArray(),
         ]);
     }
     #[Route('/stock/product/{id}/{quant}', name: 'output_stock_product', methods: ['POST'])]
@@ -82,7 +85,7 @@ class StockProductController extends AbstractController
         
         return $this->json([
             'message' => 'Output accepted',
-            'data'=> $product
+            'data'=> $product->toArray()
         ]);
     }
     #[Route('/stock/product/{id}', name: 'filter_stock_product', methods: ['GET'])]
@@ -92,7 +95,7 @@ class StockProductController extends AbstractController
 
         return $this->json([
             'message' => 'Product Found',
-            'data'=> $product
+            'data'=> $product->toArray()
         ]);
     }
 

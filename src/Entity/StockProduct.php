@@ -78,4 +78,14 @@ class StockProduct
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'id'=> $this->getId(),
+            'quant'=> $this->getQuant(),
+            'Product'=> $this->getProduct()->toArray(),
+            'Lote'=> $this->getCodLote(),
+        ];
+    }
 }

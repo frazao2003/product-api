@@ -47,8 +47,18 @@ class StockProductService {
                 throw new \Exception("Product not found in stock");
             }
             $product->setQuant($product->getQuant() + $entry->getQuant());
+            $this->em->persist($product);
+            $this->em->flush();
+            return $product;
         }
-        $product = $this->stockProductRepository->findByCodLote($entry->getCodLote());
+        if($entry->getExpirationDate() <new \DateTime('now'))
+        {
+            throw new \Exception('Expiration date not valid')
+        }
+        if($entry->getCodLote())
+        {
+            $product = $this->stockProductRepository->findByCodLote($entry->getCodLote());
+        }
         if($product)
         {
             if ($product->getExpirationDate() == $entry->getExpirationDate())

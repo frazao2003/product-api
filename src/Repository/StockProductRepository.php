@@ -17,12 +17,12 @@ class StockProductRepository extends ServiceEntityRepository
         parent::__construct($registry, StockProduct::class);
     }
 
-    public function findByCodLote(string $cod): StockProduct
+    public function findByCodLote(string $cod): ?StockProduct
     {
         return $this->createQueryBuilder("sp")
         ->andwhere("sp.codLote = :codLote")
         ->setParameter("codLote", $cod)
-        ->getQuery()->getResult();
+        ->getQuery()->getOneorNullResult();
     }
 
     public function filterStockProducts(StockProdFilter $filter): array

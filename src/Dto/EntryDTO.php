@@ -6,10 +6,10 @@ use DateTime;
 
 class EntryDTO{
 
-    public string $codLote;
-    public Product $product;
-    public DateTime $expirationDate;
-    public int $quant;
+    public ?string $codLote;
+    public ?Product $product;
+    public ?DateTime $expirationDate;
+    public ?int $quant;
     public ?int $id;
 
     public function __construct(?string $codLote = null, ?Product $product=null, ?DateTime $expirationDate=null, ?int $quant = null, ?int $id = null) {
@@ -40,15 +40,15 @@ class EntryDTO{
     {
         return $this->id;
     }
-    public function setCodLote(string $codLote): void
+    public function setCodLote(?string $codLote): void
     {
         $this->codLote = $codLote;
     }
-    public function setProduct(Product $product): void
+    public function setProduct(?Product $product): void
     {
         $this->product = $product;
     }
-    public function setExpirationDate(DateTime $expirationDate): void
+    public function setExpirationDate(?DateTime $expirationDate): void
     {
         $this->expirationDate = $expirationDate;
     }
@@ -56,7 +56,7 @@ class EntryDTO{
     {
        $this->quant = $quant;
     }
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }

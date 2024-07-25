@@ -124,4 +124,13 @@ class StockProductService {
         }
         return $data;
     }
+
+    public function getAllProdExpirated():array
+    {
+        $stockProducts = $this->stockProductRepository->expiratedProd();
+        foreach ($stockProducts as $stockProduct){
+            $data [] = $stockProduct->toArray();
+        }
+        return $data;
+    }
 }

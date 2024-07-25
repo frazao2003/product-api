@@ -77,4 +77,15 @@ class StockProductRepository extends ServiceEntityRepository
     
         return $qb->getQuery()->getResult();
     }
+
+    public function expiratedProd(): array
+    {
+        $dateTime = new \DateTimeImmutable('now');
+
+        $qb = $this->createQueryBuilder('sp');
+        $qb->where('sp.expirationDate <= :expirationDate')
+        ->setParameter('expirationDate', $dateTime);
+
+        return $qb->getQuery()->getResult();
+    }
 }

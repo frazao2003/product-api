@@ -127,7 +127,14 @@ class StockProductController extends AbstractController
             'data'=> $stockProduct
         ],200);
     }
-
-
-
+    #[Route('/stock/product/expirated/products', name: 'expiration_products_stock_product', methods: ['GET'])]
+    public function getAllExpiratedProd(): JsonResponse
+    {
+        $data = $this->stockProductService->getAllProdExpirated();
+        return $this->json([
+            'message'=> 'All expirated products in stock',
+            'data'=> $data
+        ],200);
+        
+    }
 }

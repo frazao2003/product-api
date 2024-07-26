@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Service;
-use App\Dto\EntryDTO;
+use App\Dto\InputsDTO;
 use App\Dto\StockProdFilter;
+use App\Entity\Inputs;
 use App\Repository\StockProductRepository;
 use App\Entity\StockProduct;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\InputsSave;
 
 class StockProductService {
 
@@ -52,8 +54,10 @@ class StockProductService {
     public function inputs(array $entrys): array
     {
         $data = [];
+        $inputsSave [] = [];
         foreach($entrys as $entry)
         {
+            $inputsDTO = new InputsDTO();
             if ($entry->getId())
             {
                 $product = $this->getById($entry->getId());
@@ -63,8 +67,11 @@ class StockProductService {
                 }
                 $product->setQuant($product->getQuant() + $entry->getQuant());
                 $this->em->persist($product);
-                $this->em->flush();
+                $inputsDTO->setQuant($entry->getQuant());
+                $inputsDTO->setIdProductInStock($product->getId());
+                $inputsSave [] = $inputsDTO;
                 $data[] = $product->toArray();
+                continue;
             }
             if($entry->getExpirationDate() < new \DateTime('now'))
             {
@@ -76,30 +83,41 @@ class StockProductService {
             }
             if($product)
             {
-                if ($product->getExpirationDate() == $entry->getExpirationDate())
+                if ($product->getExpirationDate() == $entry->getExpirationDate() && $product->getProduct() == $entry->getProduct())
                 {
-                    if ($product->getProduct() == $entry->getProduct())
-                    {
-                        $product->setQuant($entry->getQuant() + $product->getQuant());
-                        $this->em->persist($product);
-                        $this->em->flush();
-                        $data[] = $product -> toArray();
-                    }
+
+                    $product->setQuant($entry->getQuant() + $product->getQuant());
+                    $this->em->persist($product);
+                    $inputsDTO->setQuant($entry->getQuant());
+                    $inputsDTO->setIdProductInStock($product->getId());
+                    $inputsSave [] = $inputsDTO;
+                    $data[] = $product->toArray();
+                    continue;
+            
                 }
             }
-            $product = new StockProduct();
-            $product->setCodLote($entry->getCodLote());
-            $product->setQuant($entry->getQuant());
-            $product ->setExpirationDate($entry->getExpirationDate());
-            $product->setProduct($entry->getProduct());
-            $this->em->persist($product);
-            $this->em->flush();
-            $data[] = $product -> toArray();
+            $newProduct = new StockProduct();
+            $newProduct->setCodLote($entry->getCodLote());
+            $newProduct->setQuant($entry->getQuant());
+            $newProduct ->setExpirationDate($entry->getExpirationDate());
+            $newProduct->setProduct($entry->getProduct());
+            $this->em->persist($newProduct);
+            
+            $inputsDTO->setQuant($entry->getQuant());
+            $inputsDTO->setIdProductInStock($newProduct->getId());
+            $inputsSave [] = $inputsDTO;
 
+            $data[] = $product->toArray();
+            
         }
-        return $data;
         
+        $inputs = new InputsSave();
+        $inputs->setInputs($inputsSave);
+        $inputs->setCreatedAt(new \DateTimeImmutable('now'));
 
+        $this->em->persist($inputs);
+        $this->em->flush();
+        return $data;
     }
 
     public function outputs(int $id, int $quant): StockProduct

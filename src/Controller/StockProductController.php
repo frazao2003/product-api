@@ -71,9 +71,12 @@ class StockProductController extends AbstractController
 
         }else{throw new \Exception('Data format not accepted');}
 
-        if (isset($data['items']) && is_array($data['items']))
+        if (!isset($data['items']) && is_array($data['items']))
         {
+            return new JsonResponse(['message' => 'Invalid input data'], 400);
+        }
             $itens = $data['items'];
+            $entrysDTO = [];
             foreach ($itens as $data)
             {
                 $idProduct = $data['idProduct'];
@@ -92,9 +95,7 @@ class StockProductController extends AbstractController
                 $entrysDTO [] = $entryDTO;
 
             }
-        }
-
-
+        
         $product = $this->stockProductService->inputs($entrysDTO);
         
         return $this->json([

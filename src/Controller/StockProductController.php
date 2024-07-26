@@ -70,25 +70,36 @@ class StockProductController extends AbstractController
             $data = $request->toArray();
 
         }else{throw new \Exception('Data format not accepted');}
-        $idProduct = $data['idProduct'];
-        $product = null;
-        if ($data['idProduct']){
-            $product = $this->productService->getProductById($idProduct);
+
+        if (isset($data['items']) && is_array($data['items']))
+        {
+            $itens = $data['items'];
+            foreach ($itens as $data)
+            {
+                $idProduct = $data['idProduct'];
+                $product = null;
+                if ($data['idProduct']){
+                    $product = $this->productService->getProductById($idProduct);
+                }
+                $date = new \DateTime($data['expirationDate']);
+
+                $entryDTO = new EntryDTO();
+                $entryDTO->setCodLote($data['codLote']);
+                $entryDTO->setExpirationDate($date);
+                $entryDTO->setProduct($product);
+                $entryDTO->setQuant($data['quant']);
+                $entryDTO->setId($data['id']);
+                $entrysDTO [] = $entryDTO;
+
+            }
         }
-        $date = new \DateTime($data['expirationDate']);
 
-        $entryDTO = new EntryDTO();
-        $entryDTO->setCodLote($data['codLote']);
-        $entryDTO->setExpirationDate($date);
-        $entryDTO->setProduct($product);
-        $entryDTO->setQuant($data['quant']);
-        $entryDTO->setId($data['id']);
 
-        $product = $this->stockProductService->inputs($entryDTO);
+        $product = $this->stockProductService->inputs($entrysDTO);
         
         return $this->json([
             'message' => 'Input accepted',
-            'data' => $product->toArray(),
+            'data' => $product,
         ],201);
     }
     #[Route('/stock/product/{id}/{quant}', name: 'output_stock_product', methods: ['POST'])]

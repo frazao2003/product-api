@@ -49,49 +49,56 @@ class StockProductService {
         return $stockProduct;
     }
 
-    public function inputs(EntryDTO $entry): StockProduct
+    public function inputs(array $entrys): array
     {
-        if ($entry->getId())
+        $data = [];
+        foreach($entrys as $entry)
         {
-            $product = $this->getById($entry->getId());
-            if(empty($product))
+            if ($entry->getId())
             {
-                throw new \Exception("Product not found in stock");
-            }
-            $product->setQuant($product->getQuant() + $entry->getQuant());
-            $this->em->persist($product);
-            $this->em->flush();
-            return $product;
-        }
-        if($entry->getExpirationDate() < new \DateTime('now'))
-        {
-            throw new \Exception('Expiration date not valid');
-        }
-        if($entry->getCodLote())
-        {
-            $product = $this->stockProductRepository->findByCodLote($entry->getCodLote());
-        }
-        if($product)
-        {
-            if ($product->getExpirationDate() == $entry->getExpirationDate())
-            {
-                if ($product->getProduct() == $entry->getProduct())
+                $product = $this->getById($entry->getId());
+                if(empty($product))
                 {
-                    $product->setQuant($entry->getQuant() + $product->getQuant());
-                    $this->em->persist($product);
-                    $this->em->flush();
-                    return $product;
+                    throw new \Exception("Product not found in stock");
+                }
+                $product->setQuant($product->getQuant() + $entry->getQuant());
+                $this->em->persist($product);
+                $this->em->flush();
+                $data[] = $product->toArray();
+            }
+            if($entry->getExpirationDate() < new \DateTime('now'))
+            {
+                throw new \Exception('Expiration date not valid');
+            }
+            if($entry->getCodLote())
+            {
+                $product = $this->stockProductRepository->findByCodLote($entry->getCodLote());
+            }
+            if($product)
+            {
+                if ($product->getExpirationDate() == $entry->getExpirationDate())
+                {
+                    if ($product->getProduct() == $entry->getProduct())
+                    {
+                        $product->setQuant($entry->getQuant() + $product->getQuant());
+                        $this->em->persist($product);
+                        $this->em->flush();
+                        $data[] = $product -> toArray();
+                    }
                 }
             }
+            $product = new StockProduct();
+            $product->setCodLote($entry->getCodLote());
+            $product->setQuant($entry->getQuant());
+            $product ->setExpirationDate($entry->getExpirationDate());
+            $product->setProduct($entry->getProduct());
+            $this->em->persist($product);
+            $this->em->flush();
+            $data[] = $product -> toArray();
+
         }
-        $product = new StockProduct();
-        $product->setCodLote($entry->getCodLote());
-        $product->setQuant($entry->getQuant());
-        $product ->setExpirationDate($entry->getExpirationDate());
-        $product->setProduct($entry->getProduct());
-        $this->em->persist($product);
-        $this->em->flush();
-        return $product;
+        return $data;
+        
 
     }
 

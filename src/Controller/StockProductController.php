@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Dto\EntryDTO;
+use App\Dto\OutputsDTO;
 use App\Dto\StockProdFilter;
 use App\Service\ProductService;
 use App\Service\StockProductService;
@@ -103,14 +104,35 @@ class StockProductController extends AbstractController
             'data' => $product,
         ],201);
     }
-    #[Route('/stock/product/{id}/{quant}', name: 'output_stock_product', methods: ['POST'])]
-    public function outputs(int $quant, int $id): JsonResponse
+    #[Route('/stock/product/outputs', name: 'output_stock_product', methods: ['POST'])]
+    public function outputs(Request $request): JsonResponse
     {
-        $product = $this->stockProductService->outputs($id, $quant);
+        if($request -> headers->get('Content-Type') == 'application/json'){
+            $data = $request->toArray();
+
+        }else{throw new \Exception('Data format not accepted');}
+
+        if (!isset($data['items']) && is_array($data['items']))
+        {
+            return new JsonResponse(['message' => 'Invalid input data'], 400);
+        }
+        $itens = $data['items'];
+        $outputs = [];
+        foreach ($itens as $data)
+        {
+            $idProduct = $data['idProduct'];
+            $quant = $data['quant'];
+            $outputsDto = new OutputsDTO();
+            $outputsDto->setoIdProduct($idProduct);
+            $outputsDto->setQuant($quant);
+            $outputs [] = $outputsDto;
+        }
+
+        $product = $this->stockProductService->outputs($outputs);
         
         return $this->json([
             'message' => 'Output accepted',
-            'data'=> $product->toArray()
+            'data'=> $product
         ],201);
     }
     #[Route('/stock/product/{id}', name: 'get_byid_stock_product', methods: ['GET'])]

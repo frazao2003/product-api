@@ -3,7 +3,7 @@
 namespace App\Service;
 use App\Dto\InputsDTO;
 use App\Dto\StockProdFilter;
-use App\Entity\Inputs;
+use App\Entity\Outputs;
 use App\Repository\StockProductRepository;
 use App\Entity\StockProduct;
 use Doctrine\ORM\EntityManagerInterface;
@@ -120,20 +120,27 @@ class StockProductService {
         return $data;
     }
 
-    public function outputs(int $id, int $quant): StockProduct
+    public function outputs(array $outputs): array
     {
-        $product = $this->getById($id);
-        if(!$product){
-            throw new \Exception("Product not found");
+        $outputs = new Outputs;
+        $outputsArray = [];
+        foreach($outputs as $outputsDTO) {
+            $product = $this->getById($outputsDTO->getIdProduct());
+            if(!$product){
+                throw new \Exception("Product not found");
+            }
+            if($product->getQuant() < $outputsDTO->getQuant())
+            {
+                throw new \Exception("Unavailable quantity");
+            }
+            $product->setQuant($product->getQuant() - $outputsDTO->getQuant());
+            $this->em->persist($product);
+            $outputsArray [] = $outputsDTO;
         }
-        if($product->getQuant() < $quant)
-        {
-            throw new \Exception("Unavailable quantity");
-        }
-        $product->setQuant($product->getQuant() - $quant);
-        $this->em->persist($product);
+        $outputs->setOutputsDTO($outputsArray);
+        $this->em->persist($outputs);
         $this->em->flush();
-        return $product;
+        return $outputsArray;
     }
 
     public function filterDateRange(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array

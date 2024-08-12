@@ -52,11 +52,11 @@ class ProductService{
     public function createProduct(String $nome, int $idTypeProduct):array{
         $productValidate = $this->productRepository->findOneByName($nome);
         if($productValidate){ 
-            throw new \Exception("Este nome de produto já está cadastrado");
+            throw new \Exception("Thats product with this name: $nome is already registred");
         }
         $typeProduct = $this->typeProductService->findById($idTypeProduct);
         if(is_null($typeProduct)){
-            throw new \Exception("Product Type not found");
+            throw new \Exception("Product Type with this $idTypeProduct not found");
         }
         $product = new Product();
         $product->setName($nome);
@@ -68,7 +68,7 @@ class ProductService{
 
     public function updateProduct(int $id, int $idType, String $newNome) :Product
     {
-        $productValidate = $this->productRepository->find($id);
+        $productValidate = $this->productRepository->findById($id);
         if(is_null($productValidate))
         {
             throw new \Exception("Product not found");
@@ -85,20 +85,24 @@ class ProductService{
 
     }
 
-    public function deleteProduct(int $id)
+    public function deleteProduct(int $id): Product
     {
-       $productValidate = $this->productRepository->find($id);
-       if(is_null($productValidate)){
-        throw new \Exception("Product not found");
+        $productValidate = $this->productRepository->findById($id);
+       if($productValidate == null){
+        throw new \Exception("Product with ID: $id not found");
        }
        $stockFilter = new StockProdFilter();
        $stockFilter->setProduct($productValidate);
        if(count($this->stockProductService->filterStockProd($stockFilter)) > 0)
        {
-           throw new \Exception("Delete failed, product already vinculated");
+        throw new \Exception("Delete failed, product already vinculated");
        } 
-       $this->entityManager->remove($productValidate);
-       $this->entityManager->flush();
+       try{
+        $this->productRepository->delete($productValidate);
+       }catch(\Exception $e)
+       {
+        throw new \Exception("Error 3212". $e->getMessage());
+       }
        return $productValidate;
     }
 

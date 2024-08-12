@@ -38,9 +38,31 @@ class ProductRepository extends ServiceEntityRepository
                    ->setParameter('typeProduct', $filter->getType());
                 $hasFilter = true;
             }
+
+            if ($hasFilter == false) {
+                $products = $this->findAll();
+                return $products;
+            }
     
             // Simulação da execução da query e retorno dos resultados
             return $qb->getQuery()->getResult();
+        }
+
+        public function findById(int $id): ?Product
+        {
+            $product = $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+            return $product;
+        }
+
+        public function delete(Product $product): void
+        {
+            $this->getEntityManager()->remove($product);
+            $this->getEntityManager()->flush();
         }
 
 }

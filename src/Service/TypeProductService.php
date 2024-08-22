@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Service;
-use App\Dto\StockProdFilter;
 use App\Dto\TypeProdFilterDto;
 use App\Repository\TypeProductRepository;
 use App\Entity\TypeProduct;
@@ -64,12 +63,10 @@ final class TypeProductService
         if(!$typeProduct){
             throw new \Exception("Product type not found");
         }
-        $stockFilter = new StockProdFilter();
-        $stockFilter->setTypeProduct($typeProduct);
-        if(count($this->stockProductService->filterStockProd($stockFilter)) > 0)
+        if(count($typeProduct->getProducts()) > 0)
         {
-            throw new \Exception("Delete failed, product type already vinculated");
-        }       
+            throw new \Exception("Product Type is already vinculated");
+        }
         $this->entityManager->remove($typeProduct);
         $this->entityManager->flush();
         $data = $typeProduct->toArray();

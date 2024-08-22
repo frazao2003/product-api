@@ -3,7 +3,6 @@
 namespace App\Service;
 use App\Dto\ProductFilter;
 use App\Dto\StockProdFilter;
-use App\Entity\TypeProduct;
 use App\Repository\ProductRepository;
 use App\Service\TypeProductService;
 use App\Entity\Product;
@@ -77,6 +76,7 @@ class ProductService{
         if(is_null($typeProduct)){
             throw new \Exception("Product Type not found");
         }
+
         $productValidate->setName($newNome);
         $productValidate->setTypeProduct($typeProduct);
         $this->entityManager->persist($productValidate);
@@ -87,39 +87,23 @@ class ProductService{
 
     public function deleteProduct(int $id): Product
     {
-        $productValidate = $this->productRepository->findById($id);
-       if($productValidate == null){
-        throw new \Exception("Product with ID: $id not found");
-       }
-       $stockFilter = new StockProdFilter();
-       $stockFilter->setProduct($productValidate);
-       if(count($this->stockProductService->filterStockProd($stockFilter)) > 0)
-       {
-        throw new \Exception("Delete failed, product already vinculated");
-       } 
-       try{
-        $this->productRepository->delete($productValidate);
-       }catch(\Exception $e)
-       {
-        throw new \Exception("Error 3212". $e->getMessage());
-       }
-       return $productValidate;
-    }
-
-    public function getAllByTypeProduct(int $idtypeProduct) : array
-    {
-        $typeProduct = $this->typeProductService->findById($idtypeProduct);
-        if(is_null($typeProduct))
-        {
-            throw new \Exception("Product Type not found");
+        try {
+            $productValidate = $this->productRepository->findById($id);
+            if ($productValidate == null) {
+                throw new \Exception("Product with ID: $id not found");
+            }
+    
+            $stockFilter = new StockProdFilter();
+            $stockFilter->setProduct($productValidate);
+            if (count($this->stockProductService->filterStockProd($stockFilter)) > 0) {
+                throw new \Exception("Delete failed, product already vinculated");
+            }    
+            $this->productRepository->delete($productValidate);
+    
+            return $productValidate;
+        } catch (\Exception $e) {
+            throw new \Exception('Error deleting product: '); // Re-throw exception for further handling
         }
-        $products = $this->productRepository->findByTypeProduct($typeProduct);
-        if(is_null($products))
-        {
-            throw new \Exception("Product type invalid");
-        }
-        return $products;
     }
-
 
 }

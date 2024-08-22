@@ -77,7 +77,7 @@ class ProductController extends AbstractController
         $productFilter->setName($request->query->get("name"));
         $productFilter->setType(null);
 
-        if($request->query->get("idTypeProduct")) 
+        if($request->query->get("idTypeProduct") !== null) 
         {
             $typeProduct = $this->typeProductService->findById($request->query->get("idTypeProduct"));
             $productFilter->setType($typeProduct);
@@ -197,8 +197,35 @@ class ProductController extends AbstractController
         ],201); 
     }
 
-
-    #[Route('/api/product/{id}', name:'get_by_id', methods: ['GET'])]
+     
+    #[Route('/api/productgetbyID/{id}', name:'get_product_by_id', methods: ['GET'])]
+    #[OA\Get(
+        path: "/api/productgetbyID/{id}",
+        summary: "Get a product by id",
+        description: "Get a product by id",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID of the product to get",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Product Find Successfully",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "message", type: "string"),
+                        new OA\Property(property: "product", ref: new Model(type: Product::class))
+                    ]
+                )
+            )
+        ],tags: ["Product"]
+    )]
     public function getByid(int $id): JsonResponse
     {
         $product = $this->productService->getProductByid($id);

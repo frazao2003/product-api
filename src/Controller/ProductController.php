@@ -183,6 +183,33 @@ class ProductController extends AbstractController
 
 
     #[Route('/api/product/{id}/{idType}', name:'update_product', methods: ['PUT'])]
+    #[OA\Put(
+        path: "/api/product/{id}/{idType}",
+        summary: "Update a product",
+        description: "Updates a product by its ID",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                in: "path",
+                description: "ID of the product to update",
+                required: true,
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Product Updated Successfully",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "message", type: "string"),
+                        new OA\Property(property: "product", ref: new Model(type: Product::class))
+                    ]
+                )
+            )
+        ],tags: ["Product"]
+    )]
     public function update(Request $request, int $id, int $idType): JsonResponse
     {
         if($request -> headers->get('Content-Type') == 'application/json'){
@@ -224,7 +251,7 @@ class ProductController extends AbstractController
                     ]
                 )
             )
-        ],tags: ["Product"]
+        ],tags: ["Product"] 
     )]
     public function getByid(int $id): JsonResponse
     {
